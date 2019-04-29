@@ -166,8 +166,9 @@ trait CrudTrait
      * @param  [type] $attribute_name   Model attribute name (and column in the db).
      * @param  [type] $disk             Filesystem disk used to store files.
      * @param  [type] $destination_path Path in disk where to store the files.
+     * @param  [type] $name             Name for the uploaded file
      */
-    public function uploadFileToDisk($value, $attribute_name, $disk, $destination_path)
+    public function uploadFileToDisk($value, $attribute_name, $disk, $destination_path, $name = false)
     {
         $request = \Request::instance();
 
@@ -188,8 +189,8 @@ trait CrudTrait
         // if a new file is uploaded, store it on disk and its filename in the database
         if ($request->hasFile($attribute_name) && $request->file($attribute_name)->isValid()) {
             // 1. Generate a new file name
-            $file = $request->file($attribute_name);
-            $new_file_name = md5($file->getClientOriginalName().time()).'.'.$file->getClientOriginalExtension();
+            $file = $request->file($attribute_name);            
+            $new_file_name = $name ? $name.'.'.$file->getClientOriginalExtension() : md5($file->getClientOriginalName().time()).'.'.$file->getClientOriginalExtension();
 
             // 2. Move the new file to the correct path
             $file_path = $file->storeAs($destination_path, $new_file_name, $disk);
